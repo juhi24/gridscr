@@ -30,15 +30,19 @@ def filter_filepaths(filepaths_all, remove_bad=False, verbose=False):
     """skip or remove filepaths that trigger data_is_bad"""
     filepaths_good = copy.deepcopy(filepaths_all)
     for filepath in filepaths_all:
-        with nc.Dataset(filepath, 'r') as ncdata:
-            if data_is_bad(ncdata):
-                filepaths_good.remove(filepath)
-                if remove_bad:
-                    remove(filepath)
-                    if verbose:
-                        eprint('rm ' + filepath)
-                elif verbose:
-                    eprint('filtered ' + filepath)
+        try:
+            with nc.Dataset(filepath, 'r') as ncdata:
+                if data_is_bad(ncdata):
+                    filepaths_good.remove(filepath)
+                    if remove_bad:
+                        remove(filepath)
+                        if verbose:
+                            eprint('rm ' + filepath)
+                    elif verbose:
+                        eprint('filtered ' + filepath)
+        except FileNotFoundError:
+            eprint('Filtering unfound file {}.'.format(filepath))
+            filepaths_good.remove(filepath)
     return filepaths_good
 
 
@@ -57,7 +61,7 @@ def apply_file_filter(filepaths, sites=['VAN', 'KER', 'KUM'],
             paths = []
             for k in filepaths_good:
                 if '/{}/'.format(site) in k:
-                    paths.append(path)
+                    paths.append(k)
                     print(k)
             outpath = fpath(site, gridpath=write_path)
             spaths = pd.Series(paths)
