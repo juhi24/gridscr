@@ -19,18 +19,22 @@ def cfrad_filename(radar, task_key='sigmet_task_name'):
     """Generate cfrad filename for radar object based on metadata."""
     time = radar_start_datetime(radar)
     timestr = time.strftime('%Y%m%d_%H%M%S')
-    instrument = radar.metadata['instrument_name']
-    task = radar.metadata[task_key].rstrip()
+    instrument = radar.metadata['instrument_name'].decode('utf-8')
+    task = radar.metadata[task_key].rstrip().decode('utf-8')
     naming = 'cfrad.{timestr}_{instrument}_{task}.nc'
     name = naming.format(timestr=timestr, instrument=instrument, task=task)
     return name
 
 
-def sigmet2cfrad(filepath, outdir='cf', verbose=False):
+def sigmet2cfrad(filepath, outdir='cf', dirlock=None, verbose=False):
     """Convert Sigmet raw radar data to cfradial format"""
     radar = io.read_sigmet(filepath)
     time = radar_start_datetime(radar)
+    if dirlock:
+        dirlock.acquire()
     subdir = ensure_dir(path.join(outdir, time.strftime('%Y%m%d')))
+    if dirlock:
+        dirlock.release()
     out_filepath =  path.join(subdir, cfrad_filename(radar))
     if verbose:
         print(out_filepath)

@@ -6,7 +6,7 @@ __metaclass__ = type
 import argparse
 import textwrap
 from os import path
-from multiprocessing import Pool
+from multiprocessing import Pool, Manager
 from functools import partial
 from radpy.pyart_tools import sigmet2cfrad
 from pyart import config
@@ -15,7 +15,7 @@ from pyart import config
 def make_parser():
     example = textwrap.dedent('''\
         Example:
-          {} ???data/*/*.raw
+          {} ???data/*/*.raw ???data/*/*/*.RAW*
         ''')
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description='Convert raw Sigmet radar data to cfradial.')
@@ -29,11 +29,13 @@ def make_parser():
                         help='increase output verbosity')
     parser.epilog = example.format(parser.prog)
     return parser
-    
+
 
 def main(filepaths, **kws):
     p = Pool()
-    p.map(partial(sigmet2cfrad, **kws), filepaths)
+    m = Manager()
+    dirlock = m.Lock()
+    p.map(partial(sigmet2cfrad, dirlock=dirlock, **kws), filepaths)
 
 
 if __name__ == '__main__':
