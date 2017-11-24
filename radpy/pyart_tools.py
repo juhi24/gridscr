@@ -4,8 +4,12 @@ __metaclass__ = type
 
 import datetime
 from os import path
-from pyart import io
+from pyart import io, config
 from j24.path import ensure_dir, filename_friendly
+
+
+conf_path = path.join(path.dirname(path.realpath(__file__)), 'radpy', 'pyart_config.py')
+conf = config.load_config(conf_path)
 
 
 def radar_start_datetime(radar):
@@ -40,3 +44,27 @@ def sigmet2cfrad(filepath, outdir='cf', dirlock=None, verbose=False):
         print(out_filepath)
     io.write_cfradial(out_filepath, radar)
 
+
+def is_bad(radar):
+    """Check if pyart data is useless for rainrate composite."""
+    instrument = radar.metadata['instrument_name']
+    if instrument == 'VANTAA':
+        bad_instr = is_bad_van(radar)
+    elif 'Kerava' in instrument:
+        bad_instr = is_bad_ker(radar)
+    elif 'Kumpula' in instrument:
+        bad_instr = is_bad_kum(radar)
+    return bad_instr
+
+
+def is_bad_van(radar, task_key='sigmet_task_name'):
+    task = radar.metadata[task_key]
+    return ('PPI' not in task) or ('_B' not in task)
+
+
+def is_bad_ker(radar):
+    return False
+
+
+def is_bad_kum(radar):
+    return False
