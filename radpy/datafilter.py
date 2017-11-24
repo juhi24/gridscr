@@ -4,14 +4,18 @@ import getpass
 import pandas as pd
 import netCDF4 as nc
 from os import path, remove
-from glob import glob
 from j24 import eprint
 
 basepath = path.join('/media', getpass.getuser(), '04fafa8f-c3ca-48ee-ae7f-046cf576b1ee')
 GRIDPATH = path.join(basepath, 'grids')
 
+try:
+    FileNotFoundError
+except NameError:
+    class FileNotFoundError(IOError): pass
 
 def data_is_bad(ncdata):
+    """Check if gridded data is not good for rainrate composite."""
     lvar = list(ncdata.variables)
     z = ncdata.variables['z0']
     not_ppi = False # TODO
@@ -47,11 +51,13 @@ def filter_filepaths(filepaths_all, remove_bad=False, verbose=False):
 
 
 def fpath(site, gridpath=GRIDPATH):
+    """file list path"""
     return path.join(gridpath, '{}_goodfiles.csv'.format(site))
 
 
 def apply_file_filter(filepaths, sites=['VAN', 'KER', 'KUM'],
                       write_lists=False, write_path=None, **kws):
+    """Filter filepaths and optionally write lists of good files."""
     write_path = write_path or path.realpath(path.join(filepaths[0], '..', '..', '..'))
     filepaths.sort()
     # filtering takes a lot of time
@@ -69,6 +75,7 @@ def apply_file_filter(filepaths, sites=['VAN', 'KER', 'KUM'],
 
 
 def load(**kws):
+    """Load file list."""
     out = dict(KUM=None, KER=None, VAN=None)
     for site in out:
         out[site] = pd.read_csv(fpath(site, **kws), header=None, names=['filepath'])

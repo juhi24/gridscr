@@ -5,7 +5,7 @@ __metaclass__ = type
 import datetime
 from os import path
 from pyart import io
-from j24 import ensure_dir
+from j24.path import ensure_dir, filename_friendly
 
 
 def radar_start_datetime(radar):
@@ -19,8 +19,8 @@ def cfrad_filename(radar, task_key='sigmet_task_name'):
     """Generate cfrad filename for radar object based on metadata."""
     time = radar_start_datetime(radar)
     timestr = time.strftime('%Y%m%d_%H%M%S')
-    instrument = radar.metadata['instrument_name'].decode('utf-8')
-    task = radar.metadata[task_key].rstrip().decode('utf-8')
+    instrument = filename_friendly(radar.metadata['instrument_name']).decode('utf-8')
+    task = filename_friendly(radar.metadata[task_key]).decode('utf-8')
     naming = 'cfrad.{timestr}_{instrument}_{task}.nc'
     name = naming.format(timestr=timestr, instrument=instrument, task=task)
     return name
