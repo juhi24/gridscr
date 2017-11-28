@@ -3,5 +3,7 @@ Tools for generating a rainrate composite using Helsinki metropolitean area weat
 
 ## Usage
 See the options for the main workflow script with
-```composite_workflow.sh -h```
+```
+composite_workflow.sh -h
+```
 
