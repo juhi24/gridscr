@@ -1,15 +1,40 @@
 #!/bin/bash
-# usage: composite_workflow.sh /log/dir
-cfdir=cf
-logdir=$1
-echo "### Raw conversion."
-raw2cfrad.py -v -o $cfdir ???data/*/*.raw ???data/*/*/*.RAW* > $logdir/raw2cfrad.log 2> $logdir/raw2cfrad.err
-echo "### Adding extra variables."
-mlenv.sh var2nc "$cfdir/*/cfrad.*.nc" > $logdir/var2nc.log 2> $logdir/var2nc.err
-echo "### Checking KUM data for missing KDP."
-recover_kdp.py -v $cfdir/*/cfrad.*Kum*.nc > $logdir/recover_kdp.log 2> $logdir/recover_kdp.err
-echo "### Gridding."
-gridding.sh $cfdir > $logdir/gridding.log 2> $logdir/gridding.err
-echo "### Compositing."
-qpe_composite.sh grids > $logdir/qpe_composite.log 2> $logdir/qpe_composite.err
 
+usage() {
+	echo "usage: composite_workflow.sh [-d YYYYMMDD] [-c CF_DIR] [-l LOG_DIR] [-h]"
+}
+
+# Input argument defaults
+DATE_GLOB='*'
+LOG_DIR='.'
+CF_DIR='cf'
+
+while getopts ":d:l:c:h" opt; do
+	case $opt in
+		d) DATE_GLOB="$OPTARG";;
+		c) CF_DIR=$OPTARG;;
+		l) LOG_DIR=$OPTARG;;
+		h)
+			usage
+			exit 0;;
+		\?)
+			echo "Invalid option: -$OPTARG" >&2
+			exit 1;;
+		:)
+			echo "Option -$OPTARG requires an argument." >&2
+			exit 1;;
+	esac
+done
+
+echo "### Raw conversion."
+raw2cfrad.py -v -o $CF_DIR ???data/*/*.raw ???data/*/*/*.RAW* > $LOG_DIR/raw2cfrad.log 2> $LOG_DIR/raw2cfrad.err
+echo "### Adding extra variables."
+mlenv.sh var2nc "$CF_DIR/*/cfrad.*.nc" > $LOG_DIR/var2nc.log 2> $LOG_DIR/var2nc.err
+echo "### Checking KUM data for missing KDP."
+recover_kdp.py -v $CF_DIR/*/cfrad.*Kum*.nc > $LOG_DIR/recover_kdp.log 2> $LOG_DIR/recover_kdp.err
+echo "### Gridding."
+gridding.sh $CF_DIR > $LOG_DIR/gridding.log 2> $LOG_DIR/gridding.err
+echo "### Compositing."
+qpe_composite.sh grids > $LOG_DIR/qpe_composite.log 2> $LOG_DIR/qpe_composite.err
+echo "### Postprocessing."
+compost.py -ipmv -o composite brancomp/$DATE_GLOB.mat
