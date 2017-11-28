@@ -1,8 +1,6 @@
 # gridscr
-Radx gridding and composite scripts
+Tools for generating a rainrate composite using Helsinki metropolitean area weather radars.
 
-## Workflow
-1. Fetch raw radar data
-2. Convert to cfradial using `batch_convert.sh`
-3. Add missing variables using `var2nc.sh`
-4. 
+## Usage
+`composite_workflow.sh` is the main workflow script.
+
