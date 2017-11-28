@@ -15,28 +15,33 @@ except NameError:
     class FileNotFoundError(IOError): pass
 
 def data_is_bad(ncdata):
-    """Check if gridded data is not good for rainrate composite."""
+    """DEPRECATED. Check if gridded data is not good for rainrate composite."""
     lvar = list(ncdata.variables)
+    bad_post = bad_postprocessing_result(lvar)
     z = ncdata.variables['z0']
     not_ppi = False # TODO
-    no_kdp = 'KDP' not in lvar # no KDP
     high_elev = z[0] > 1.5 # too high elevation angle
     low_elev = z[0] < 0.05 # too low elevation angle
     is_correct_van_elev = int(round(z[0]*10)) == 7
     van_wrong_elev = ncdata.title == 'VANTAA' and not is_correct_van_elev
     # KUM is missing required field
     weird_kum = 'kum' in ncdata.title and not ('UNKNOWN_ID_73' in lvar or 'UNKNOWN_ID_74' in lvar)
+    return high_elev or not_ppi or van_wrong_elev or low_elev or weird_kum or bad_post
+
+
+def bad_postprocessing_result(lvar):
+    no_kdp = 'KDP' not in lvar # no KDP
     extra_missing = 'range_km' not in lvar
-    return no_kdp or high_elev or not_ppi or van_wrong_elev or low_elev or weird_kum or extra_missing
+    return no_kdp or extra_missing
 
 
 def filter_filepaths(filepaths_all, remove_bad=False, verbose=False):
-    """skip or remove filepaths that trigger data_is_bad"""
+    """skip or remove filepaths that trigger bad_postprocessing_result"""
     filepaths_good = copy.deepcopy(filepaths_all)
     for filepath in filepaths_all:
         try:
             with nc.Dataset(filepath, 'r') as ncdata:
-                if data_is_bad(ncdata):
+                if bad_postprocessing_result(list(ncdata.variables)):
                     filepaths_good.remove(filepath)
                     if remove_bad:
                         remove(filepath)

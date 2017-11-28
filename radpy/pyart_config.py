@@ -57,9 +57,10 @@ simulated_velocity = 'simulated_velocity'
 spectrum_width = 'spectrum_width'
 
 # Differential reflectivity fields, ZDR
-differential_reflectivity = 'differential_reflectivity'
+#differential_reflectivity = 'differential_reflectivity'
+differential_reflectivity = 'ZDR'
 #corrected_differential_reflectivity = 'corrected_differential_reflectivity'
-corrected_differential_reflectivity = 'ZDR'
+corrected_differential_reflectivity = 'ZDR_CORR'
 
 # Cross correlation ratio, correlation coefficient, RhoHV
 #cross_correlation_ratio = 'cross_correlation_ratio'

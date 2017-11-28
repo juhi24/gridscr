@@ -8,7 +8,7 @@ from pyart import io, config
 from j24.path import ensure_dir, filename_friendly
 
 
-conf_path = path.join(path.dirname(path.realpath(__file__)), 'radpy', 'pyart_config.py')
+conf_path = path.join(path.dirname(path.realpath(__file__)), 'pyart_config.py')
 conf = config.load_config(conf_path)
 
 
@@ -33,6 +33,8 @@ def cfrad_filename(radar, task_key='sigmet_task_name'):
 def sigmet2cfrad(filepath, outdir='cf', dirlock=None, verbose=False):
     """Convert Sigmet raw radar data to cfradial format"""
     radar = io.read_sigmet(filepath)
+    if is_bad(radar):
+        return
     time = radar_start_datetime(radar)
     if dirlock:
         dirlock.acquire()
@@ -54,12 +56,24 @@ def is_bad(radar):
         bad_instr = is_bad_ker(radar)
     elif 'Kumpula' in instrument:
         bad_instr = is_bad_kum(radar)
-    return bad_instr
+    bad_common = is_bad_common(radar)
+    return bad_instr or bad_common
+
+
+def is_bad_common(radar):
+    no_dualpol = 'PHIDP' not in radar.fields
+    not_ppi = radar.sweep_mode['data'][0] != 'azimuth_surveillance'
+    elevation = radar.get_elevation(0).mean()
+    high_elev = elevation > 1.5
+    low_elev = elevation < 0.05
+    return no_dualpol or not_ppi or high_elev or low_elev
 
 
 def is_bad_van(radar, task_key='sigmet_task_name'):
     task = radar.metadata[task_key]
-    return ('PPI' not in task) or ('_B' not in task)
+    wrong_task = ('PPI' not in task) or ('_B' not in task)
+    no_kdp = 'KDP' not in radar.fields
+    return wrong_task or no_kdp
 
 
 def is_bad_ker(radar):
@@ -67,4 +81,6 @@ def is_bad_ker(radar):
 
 
 def is_bad_kum(radar):
-    return False
+    task = radar.metadata['sigmet_task_name']
+    wrong_task = 'APHID' in task
+    return wrong_task
