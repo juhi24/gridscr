@@ -10,4 +10,6 @@ echo "### Checking KUM data for missing KDP."
 recover_kdp.py -v $cfdir/*/cfrad.*Kum*.nc > $logdir/recover_kdp.log 2> $logdir/recover_kdp.err
 echo "### Gridding."
 gridding.sh $cfdir > $logdir/gridding.log 2> $logdir/gridding.err
+echo "### Compositing."
+qpe_composite.sh grids > $logdir/qpe_composite.log 2> $logdir/qpe_composite.err
 
