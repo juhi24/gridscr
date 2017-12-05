@@ -1,7 +1,7 @@
 #!/bin/bash
 
 usage() {
-	echo "usage: composite_workflow.sh [-d YYYYMMDD] [-c CF_DIR] [-l LOG_DIR] [-h]"
+	echo "usage: $0 [-d YYYYMMDD] [-c CF_DIR] [-l LOG_DIR] [-h]"
 }
 
 # Input argument defaults
@@ -27,7 +27,7 @@ while getopts ":d:l:c:h" opt; do
 done
 
 echo "### Raw conversion."
-raw2cfrad.py -v -o $CF_DIR ???data/*/*.raw ???data/*/*/*.RAW* > $LOG_DIR/raw2cfrad.log 2> $LOG_DIR/raw2cfrad.err
+for f in ???data/*/*.raw ???data/*/*/*.RAW*; do raw2cfrad.py -v -o $CF_DIR "$f" >> $LOG_DIR/raw2cfrad.log 2>> $LOG_DIR/raw2cfrad.err; done
 echo "### Adding extra variables."
 mlenv.sh var2nc "$CF_DIR/*/cfrad.*.nc" > $LOG_DIR/var2nc.log 2> $LOG_DIR/var2nc.err
 echo "### Checking KUM data for missing KDP."
