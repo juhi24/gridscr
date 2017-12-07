@@ -25,6 +25,8 @@ def make_parser():
     parser.add_argument('-o', '--outdir', metavar='OUTPUT_DIR', type=str,
                         default=default_out,
                         help='output directory, default: {}'.format(default_out))
+    parser.add_argument('-d', '--delete', action='store_true',
+                        help='delete skipped raw files')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='increase output verbosity')
     parser.epilog = example.format(parser.prog)
@@ -43,4 +45,5 @@ if __name__ == '__main__':
     conf = config.load_config(conf_path)
     parser = make_parser()
     args = parser.parse_args()
-    main(args.files, outdir=args.outdir, verbose=args.verbose)
+    main(args.files, outdir=args.outdir, verbose=args.verbose,
+         filter_raw=args.delete)

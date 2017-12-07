@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 usage() {
 	echo "usage: $0 [-d YYYYMMDD] [-c CF_DIR] [-l LOG_DIR] [-h]"
@@ -27,7 +28,10 @@ while getopts ":d:l:c:h" opt; do
 done
 
 echo "### Raw conversion."
-for f in ???data/*/*.raw ???data/*/*/*.RAW*; do raw2cfrad.py -v -o $CF_DIR "$f" >> $LOG_DIR/raw2cfrad.log 2>> $LOG_DIR/raw2cfrad.err; done
+trap "exit" INT
+for f in ???data/*/*.raw ???data/*/*/*.RAW*; do
+ 	raw2cfrad.py -vd -o $CF_DIR "$f" >> $LOG_DIR/raw2cfrad.log 2>> $LOG_DIR/raw2cfrad.err
+done
 echo "### Adding extra variables."
 mlenv.sh var2nc "$CF_DIR/*/cfrad.*.nc" > $LOG_DIR/var2nc.log 2> $LOG_DIR/var2nc.err
 echo "### Checking KUM data for missing KDP."

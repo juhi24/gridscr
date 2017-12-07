@@ -3,9 +3,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 __metaclass__ = type
 
 import datetime
-from os import path
+from os import path, remove
 from pyart import io, config
 from j24.path import ensure_dir, filename_friendly
+from j24 import eprint
 
 
 conf_path = path.join(path.dirname(path.realpath(__file__)), 'pyart_config.py')
@@ -30,10 +31,14 @@ def cfrad_filename(radar, task_key='sigmet_task_name'):
     return name
 
 
-def sigmet2cfrad(filepath, outdir='cf', dirlock=None, verbose=False):
+def sigmet2cfrad(filepath, outdir='cf', dirlock=None, verbose=False, filter_raw=False):
     """Convert Sigmet raw radar data to cfradial format"""
     radar = io.read_sigmet(filepath)
     if is_bad(radar):
+        if filter_raw:
+            if verbose:
+                eprint('rm {}'.format(filepath))
+            remove(filepath)
         return
     time = radar_start_datetime(radar)
     if dirlock:
