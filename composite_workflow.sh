@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 usage() {
 	echo "usage: $0 [-d YYYYMMDD] [-c CF_DIR] [-l LOG_DIR] [-h]"
