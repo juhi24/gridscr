@@ -87,5 +87,5 @@ def is_bad_ker(radar):
 
 def is_bad_kum(radar):
     task = radar.metadata['sigmet_task_name']
-    wrong_task = 'APHID' in task
+    wrong_task = ('APHID' in task) or ('ADS' in task)
     return wrong_task

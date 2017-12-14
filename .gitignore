@@ -102,3 +102,4 @@ ENV/
 
 # CUSTOM
 *.swp
+.idea/

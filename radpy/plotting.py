@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import absolute_import, division, print_function, unicode_literals
 __metaclass__ = type
+
 #import numpy as np
 #import pandas as pd
 import cartopy.crs as ccrs
@@ -20,16 +21,20 @@ RADAR = dict(ker=RADARS['KER'], kum=RADARS['KUM'], van=RADARS['VAN'])
 RESULTSDIR = path.join(home(), 'results', 'radcomp', 'brandon')
 PROJECTION = ccrs.Orthographic(central_longitude=25, central_latitude=60)
 
+
 def load(name, resultsdir=RESULTSDIR):
     matpath = path.join(resultsdir, '{}.mat'.format(name))
     return loadmat(matpath)
 
+
 DATA = load(name)
+
 
 def datalist4radar(i_radar, param='kdp', data=DATA):
     dat = data['{}_three_radars'.format(param)]
     n_timesteps = dat.shape()[3]
     return [dat[:, :, i_radar, i] for i in range(n_timesteps)]
+
 
 def datalist4timestep(i_timestep, param='kdp', data=DATA):
     if param=='r':
@@ -41,17 +46,22 @@ def datalist4timestep(i_timestep, param='kdp', data=DATA):
     datalist = out + [data['{}_composite'.format(param)][:, :, i_timestep]]
     return datalist
 
+
 def plot_fun(fun, field, data=DATA, **kws):
     return fun(field, lon=data['lon'], lat=data['lat'], **kws)
+
 
 def plot_r(r, **kws):
     return plot_fun(vis.plot_r, r, **kws)
 
+
 def plot_kdp(kdp, **kws):
     return plot_fun(vis.plot_kdp, kdp, **kws)
 
+
 def plot_dbz(dbz, **kws):
     return plot_fun(vis.plot_dbz, dbz, **kws)
+
 
 def plotvars_core(gs, plotfun=vis.plot_r, data=DATA, plot_radars=True,
                   projection=PROJECTION):
@@ -81,12 +91,14 @@ def plotvars_core(gs, plotfun=vis.plot_r, data=DATA, plot_radars=True,
                     RADAR[radarkey].draw_marker(ax=ax, transform=trans)
     return axd
 
+
 def plotvars(**kws):
     fig = plt.figure(figsize=(10, 9.5))
     gs = gridspec.GridSpec(2, 3, width_ratios=(15, 15, 1))
     gs.update(left=0.04, wspace=0.04, hspace=0.08, right=.92, top=0.95, bottom=0.05)
     axd = plotvars_core(gs, **kws)
     return fig, axd
+
 
 if __name__ == '__main__':
     plt.ion()
