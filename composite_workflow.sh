@@ -33,8 +33,8 @@ for f in ???data/*/*.raw ???data/*/*/*.RAW*; do
 done
 echo "### Adding extra variables."
 mlenv.sh var2nc "$CF_DIR/*/cfrad.*.nc" > $LOG_DIR/var2nc.log 2> $LOG_DIR/var2nc.err
-echo "### Checking KUM data for missing KDP."
-recover_kdp.py -v $CF_DIR/*/cfrad.*Kum*.nc > $LOG_DIR/recover_kdp.log 2> $LOG_DIR/recover_kdp.err
+echo "### Recover KUM Kdp."
+recover_kdp.py -fv $CF_DIR/*/cfrad.*Kum*.nc > $LOG_DIR/recover_kdp.log 2> $LOG_DIR/recover_kdp.err
 echo "### Gridding."
 gridding.sh $CF_DIR > $LOG_DIR/gridding.log 2> $LOG_DIR/gridding.err
 echo "### Compositing."

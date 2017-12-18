@@ -11,7 +11,9 @@ import pyart
 from j24 import eprint
 
 
-def kdp_recalc_if_missing(fpath, verbose=True, force_recalc=False):
+def kdp_recalc_if_missing(fpath, verbose=True, force_recalc=False,
+                          invert_mask=False):
+    """Recalculate KDP from PHIDP."""
     radar = pyart.io.read_cfradial(fpath)
     try:
         kdp, phif, phir = pyart.retrieve.kdp_maesaka(radar, psidp_field='PHIDP')
@@ -24,7 +26,11 @@ def kdp_recalc_if_missing(fpath, verbose=True, force_recalc=False):
     # if none of kdp values make sense
     if not (abs(kdp_old < 1)).any() or force_recalc:
         mask_phi = radar.get_field(0, 'PHIDP').mask
-        mask_kdp = ~kdp_old.mask + mask_phi  # inverted kdp mask
+        if invert_mask:
+            # some data had an inverted mask, invert it back
+            mask_kdp = ~kdp_old.mask + mask_phi  # inverted kdp mask
+        else:
+            mask_kdp = kdp_old.mask + mask_phi
         kdp['data'] = np.ma.masked_array(kdp['data'], mask=mask_kdp,
                                          fill_value=kdp_old.fill_value)
         radar.add_field('KDP', kdp, replace_existing=True)

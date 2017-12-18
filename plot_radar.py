@@ -6,6 +6,7 @@ __metaclass__ = type
 
 import argparse
 import matplotlib.pyplot as plt
+from radpy.pyart_tools import radar_info
 import pyart
 
 
@@ -21,23 +22,25 @@ def make_parser():
     return parser
 
 
-def plot_file(filepath, field='DBZ', max_dist=None):
+def plot_file(filepath, field='DBZ', max_dist=None, **kws):
     radar = pyart.io.read(filepath)
+    radar_info(radar)
     display = pyart.graph.RadarDisplay(radar)
     fig, ax = plt.subplots()
-    display.plot(field)
+    display.plot(field, **kws)
     display.plot_cross_hair(5)
     if max_dist:
         ax.set_ylim(-max_dist, max_dist)
         ax.set_xlim(-max_dist, max_dist)
     plt.show()
+    return radar
 
 
 def main(*args, **kws):
-    plot_file(*args, **kws)
+    return plot_file(*args, **kws)
 
 
 if __name__ == '__main__':
     parser = make_parser()
     args = parser.parse_args()
-    main(args.file, field=args.field, max_dist=args.max_dist)
+    radar = main(args.file, field=args.field, max_dist=args.max_dist)

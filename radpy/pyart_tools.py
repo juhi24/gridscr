@@ -9,10 +9,6 @@ from j24.path import ensure_dir, filename_friendly
 from j24 import eprint
 
 
-conf_path = path.join(path.dirname(path.realpath(__file__)), 'pyart_config.py')
-conf = config.load_config(conf_path)
-
-
 def radar_start_datetime(radar):
     """task start datetime of a radar object"""
     time = io.mdv_grid._time_dic_to_datetime(radar.time)
@@ -20,12 +16,30 @@ def radar_start_datetime(radar):
     return time - delta
 
 
-def cfrad_filename(radar, task_key='sigmet_task_name'):
+def instrument_name(radar):
+    """radar name in filename friendly format"""
+    return filename_friendly(radar.metadata['instrument_name'])
+
+
+def task_name(radar, task_key='sigmet_task_name'):
+    """radar task name in filename friendly format"""
+    return filename_friendly(radar.metadata[task_key])
+
+
+def radar_info(radar):
+    """Print basic info of a radar object."""
+    print('instrument: {}'.format(instrument_name(radar)))
+    print('task: {}'.format(task_name(radar)))
+    print('elevation: {}'.format(radar.elevation['data'].mean()))
+    print('fields: {}'.format(list(radar.fields)))
+
+
+def cfrad_filename(radar, **kws):
     """Generate cfrad filename for radar object based on metadata."""
     time = radar_start_datetime(radar)
     timestr = time.strftime('%Y%m%d_%H%M%S')
-    instrument = filename_friendly(radar.metadata['instrument_name']).decode('utf-8')
-    task = filename_friendly(radar.metadata[task_key]).decode('utf-8')
+    instrument = instrument_name(radar)
+    task = task_name(radar)
     naming = 'cfrad.{timestr}_{instrument}_{task}.nc'
     name = naming.format(timestr=timestr, instrument=instrument, task=task)
     return name
