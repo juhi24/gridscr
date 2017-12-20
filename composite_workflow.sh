@@ -38,6 +38,7 @@ recover_kdp.py -fv $CF_DIR/*/cfrad.*Kum*.nc > $LOG_DIR/recover_kdp.log 2> $LOG_D
 echo "### Gridding."
 gridding.sh $CF_DIR > $LOG_DIR/gridding.log 2> $LOG_DIR/gridding.err
 echo "### Compositing."
+mkdir -p brancomp
 qpe_composite.sh grids > $LOG_DIR/qpe_composite.log 2> $LOG_DIR/qpe_composite.err
 echo "### Postprocessing."
 compost.py -ipmv -o composite brancomp/$DATE_GLOB.mat
