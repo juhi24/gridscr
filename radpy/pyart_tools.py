@@ -60,7 +60,7 @@ def sigmet2cfrad(filepath, outdir='cf', dirlock=None, verbose=False, filter_raw=
     subdir = ensure_dir(path.join(outdir, time.strftime('%Y%m%d')))
     if dirlock:
         dirlock.release()
-    out_filepath =  path.join(subdir, cfrad_filename(radar))
+    out_filepath = path.join(subdir, cfrad_filename(radar))
     if verbose:
         print(out_filepath)
     io.write_cfradial(out_filepath, radar)
@@ -69,7 +69,7 @@ def sigmet2cfrad(filepath, outdir='cf', dirlock=None, verbose=False, filter_raw=
 def is_bad(radar):
     """Check if pyart data is useless for rainrate composite."""
     instrument = radar.metadata['instrument_name']
-    if instrument == 'VANTAA':
+    if 'VANTAA' in instrument:
         bad_instr = is_bad_van(radar)
     elif 'Kerava' in instrument:
         bad_instr = is_bad_ker(radar)
@@ -80,6 +80,7 @@ def is_bad(radar):
 
 
 def is_bad_common(radar):
+    """common rejection conditions for all radars"""
     no_dualpol = 'PHIDP' not in radar.fields
     not_ppi = radar.sweep_mode['data'][0] != 'azimuth_surveillance'
     elevation = radar.get_elevation(0).mean()
@@ -88,18 +89,24 @@ def is_bad_common(radar):
     return no_dualpol or not_ppi or high_elev or low_elev
 
 
-def is_bad_van(radar, task_key='sigmet_task_name'):
-    task = radar.metadata[task_key]
+def is_bad_van(radar, **kws):
+    """Vantaa radar data rejection conditions"""
+    task = task_name(radar, **kws)
     wrong_task = ('PPI' not in task) or ('_B' not in task)
     no_kdp = 'KDP' not in radar.fields
     return wrong_task or no_kdp
 
 
 def is_bad_ker(radar):
+    """Kerava radar data rejection conditions"""
     return False
 
 
-def is_bad_kum(radar):
-    task = radar.metadata['sigmet_task_name']
-    wrong_task = ('APHID' in task) or ('ADS' in task)
-    return wrong_task
+def is_bad_kum(radar, **kws):
+    """Kumpula radar data rejection conditions"""
+    task = task_name(radar, **kws)
+    instrument = instrument_name(radar)
+    #wrong_task = ('APHID' in task) or ('ADS' in task)
+    wrong_task = 'PPI_SHORT' not in task
+    wrong_radar = 'Radar_2' in instrument
+    return wrong_task or wrong_radar
