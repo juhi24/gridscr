@@ -19,15 +19,18 @@ def make_parser():
                         help='radar variable to plot, default: DBZ')
     parser.add_argument('-d', '--max-dist', type=int,
                         help='crop distance from radar (km)')
+    parser.add_argument('-v', '--vlim', type=float, nargs=2,
+                        metavar=('vmin', 'vmax'), default=None,
+                        help='minimum and maximum value to plot')
     return parser
 
 
-def plot_file(filepath, field='DBZ', max_dist=None, **kws):
+def plot_file(filepath, field='DBZ', max_dist=None, vlim=None, **kws):
     radar = pyart.io.read(filepath)
     radar_info(radar)
     display = pyart.graph.RadarDisplay(radar)
     fig, ax = plt.subplots()
-    display.plot(field, **kws)
+    display.plot(field, vmin=vlim[0], vmax=vlim[1], **kws)
     display.plot_cross_hair(5)
     if max_dist:
         ax.set_ylim(-max_dist, max_dist)
@@ -43,4 +46,5 @@ def main(*args, **kws):
 if __name__ == '__main__':
     parser = make_parser()
     args = parser.parse_args()
-    radar = main(args.file, field=args.field, max_dist=args.max_dist)
+    radar = main(args.file, field=args.field, max_dist=args.max_dist,
+                 vlim=args.vlim)
