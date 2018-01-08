@@ -18,7 +18,7 @@ def kdp_recalc_if_missing(fpath, verbose=True, force_recalc=False,
     try:
         kdp, phif, phir = pyart.retrieve.kdp_maesaka(radar, psidp_field='PHIDP')
     except IndexError:
-        eprint('Error. Skipping {}.'.format(fpath))
+        eprint('IndexError. Skipping {}.'.format(fpath))
         return
     if verbose:
         print(fpath)
@@ -31,8 +31,12 @@ def kdp_recalc_if_missing(fpath, verbose=True, force_recalc=False,
             mask_kdp = ~kdp_old.mask + mask_phi  # inverted kdp mask
         else:
             mask_kdp = kdp_old.mask + mask_phi
-        kdp['data'] = np.ma.masked_array(kdp['data'], mask=mask_kdp,
-                                         fill_value=kdp_old.fill_value)
+        try:
+            kdp['data'] = np.ma.masked_array(kdp['data'], mask=mask_kdp,
+                                             fill_value=kdp_old.fill_value)
+        except np.ma.core.MaskError:
+            eprint('MaskError. Skipping {}.'.format(fpath))
+            return
         radar.add_field('KDP', kdp, replace_existing=True)
         pyart.io.write_cfradial(fpath, radar)  # overwrite changes
         if verbose:
