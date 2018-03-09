@@ -8,6 +8,7 @@ import textwrap
 from os import path
 from multiprocessing import Pool, Manager
 from functools import partial
+import radpy
 from radpy.pyart_tools import sigmet2cfrad
 from pyart import config
 
@@ -41,8 +42,7 @@ def main(filepaths, **kws):
 
 
 if __name__ == '__main__':
-    conf_path = path.join(path.dirname(path.realpath(__file__)), 'radpy', 'pyart_config.py')
-    conf = config.load_config(conf_path)
+    conf = config.load_config(radpy.conf_path)
     parser = make_parser()
     args = parser.parse_args()
     main(args.files, outdir=args.outdir, verbose=args.verbose,

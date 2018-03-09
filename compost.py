@@ -6,6 +6,8 @@ __metaclass__ = type
 import argparse
 import textwrap
 import gc
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from os import path
 from scipy.io import loadmat
@@ -36,6 +38,7 @@ def make_parser():
 
 def main(mats, **kws):
     for matpath in mats:
+        print(matpath)
         data = loadmat(matpath)
         name = path.splitext(path.split(matpath)[-1])[0]
         batch_process(name, data=data, **kws)

@@ -27,7 +27,10 @@ def load(name, resultsdir=RESULTSDIR):
     return loadmat(matpath)
 
 
-DATA = load(name)
+try:
+    DATA = load(name)
+except:
+    DATA = None
 
 
 def datalist4radar(i_radar, param='kdp', data=DATA):
@@ -47,8 +50,8 @@ def datalist4timestep(i_timestep, param='kdp', data=DATA):
     return datalist
 
 
-def plot_fun(fun, field, data=DATA, **kws):
-    return fun(field, lon=data['lon'], lat=data['lat'], **kws)
+def plot_fun(fun, field, **kws):
+    return fun(field, **kws)
 
 
 def plot_r(r, **kws):
@@ -64,7 +67,7 @@ def plot_dbz(dbz, **kws):
 
 
 def plotvars_core(gs, plotfun=vis.plot_r, data=DATA, plot_radars=True,
-                  projection=PROJECTION):
+                  projection=PROJECTION, **kws):
     """plot to shape (2, 3) gridspec"""
     trans = ccrs.PlateCarree()
     axd = dict(ker=plt.subplot(gs[0, 0], projection=projection),
@@ -80,7 +83,7 @@ def plotvars_core(gs, plotfun=vis.plot_r, data=DATA, plot_radars=True,
         ax = axd[key]
         ax.set_ymargin(0)
         ax.set_xmargin(0)
-        plotfun(data[I_RADAR[key]], ax=ax, cax=ax_cb, transform=trans)
+        plotfun(data[I_RADAR[key]], ax=ax, cax=ax_cb, transform=trans, **kws)
         ax.set_title(NAMES[key])
         ax.coastlines(resolution='10m')
         if plot_radars:

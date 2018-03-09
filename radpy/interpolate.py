@@ -48,12 +48,13 @@ def plot_frame(r, i_timestep, tim, data=None):
     gs = gridspec.GridSpec(2, 2, width_ratios=(1, 1), height_ratios=(1, 1))
     gs.update(left=0.02, right=.95, wspace=0.15, hspace=0.05,
               top=0.97, bottom=0.01)
+    latlon = dict(lat=data['lat'], lon=data['lon'])
     axd_r = plotvars(gs[0, 0], plotfun=plot_r,
-                     data=datalist4timestep(i_timestep, param='r', data=data))
+                     data=datalist4timestep(i_timestep, param='r', data=data), **latlon)
     axd_dbz = plotvars(gs[0, 1], plotfun=plot_dbz,
-                       data=datalist4timestep(i_timestep, param='dbz', data=data))
+                       data=datalist4timestep(i_timestep, param='dbz', data=data), **latlon)
     axd_kdp = plotvars(gs[1, 0], plotfun=plot_kdp,
-                       data=datalist4timestep(i_timestep, param='kdp', data=data))
+                       data=datalist4timestep(i_timestep, param='kdp', data=data), **latlon)
     ax = plot_rainrate(r, gs[1, 1], transform=ccrs.PlateCarree())
     ax.coastlines(resolution='10m')
     tstr = tim.strftime('%Y-%m-%d %H:%M')
