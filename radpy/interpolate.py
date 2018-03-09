@@ -50,11 +50,11 @@ def plot_frame(r, i_timestep, tim, data=None):
               top=0.97, bottom=0.01)
     latlon = dict(lat=data['lat'], lon=data['lon'])
     axd_r = plotvars(gs[0, 0], plotfun=plot_r,
-                     data=datalist4timestep(i_timestep, param='r', data=data), **latlon)
+                     data=datalist4timestep(i_timestep, data=data, param='r'), **latlon)
     axd_dbz = plotvars(gs[0, 1], plotfun=plot_dbz,
-                       data=datalist4timestep(i_timestep, param='dbz', data=data), **latlon)
+                       data=datalist4timestep(i_timestep, data=data, param='dbz'), **latlon)
     axd_kdp = plotvars(gs[1, 0], plotfun=plot_kdp,
-                       data=datalist4timestep(i_timestep, param='kdp', data=data), **latlon)
+                       data=datalist4timestep(i_timestep, data=data, param='kdp'), **latlon)
     ax = plot_rainrate(r, gs[1, 1], transform=ccrs.PlateCarree())
     ax.coastlines(resolution='10m')
     tstr = tim.strftime('%Y-%m-%d %H:%M')

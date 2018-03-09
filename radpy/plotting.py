@@ -13,8 +13,6 @@ from scipy.io import loadmat
 from j24 import home
 from radcomp.qpe.radar import RADARS
 
-name = 'out17'
-
 I_RADAR = dict(ker=0, kum=1, van=2, com=3)
 NAMES = dict(ker='KER', kum='KUM', van='VAN', com='Composite')
 RADAR = dict(ker=RADARS['KER'], kum=RADARS['KUM'], van=RADARS['VAN'])
@@ -22,24 +20,13 @@ RESULTSDIR = path.join(home(), 'results', 'radcomp', 'brandon')
 PROJECTION = ccrs.Orthographic(central_longitude=25, central_latitude=60)
 
 
-def load(name, resultsdir=RESULTSDIR):
-    matpath = path.join(resultsdir, '{}.mat'.format(name))
-    return loadmat(matpath)
-
-
-try:
-    DATA = load(name)
-except:
-    DATA = None
-
-
-def datalist4radar(i_radar, param='kdp', data=DATA):
+def datalist4radar(i_radar, data, param='kdp'):
     dat = data['{}_three_radars'.format(param)]
     n_timesteps = dat.shape()[3]
     return [dat[:, :, i_radar, i] for i in range(n_timesteps)]
 
 
-def datalist4timestep(i_timestep, param='kdp', data=DATA):
+def datalist4timestep(i_timestep, data, param='kdp'):
     if param=='r':
         sitestrs = ['ker', 'kum', 'van', 'c']
         return [data['rain_{}'.format(site)][:, :, i_timestep] for site in sitestrs]
@@ -66,7 +53,7 @@ def plot_dbz(dbz, **kws):
     return plot_fun(vis.plot_dbz, dbz, **kws)
 
 
-def plotvars_core(gs, plotfun=vis.plot_r, data=DATA, plot_radars=True,
+def plotvars_core(gs, plotfun=vis.plot_r, data, plot_radars=True,
                   projection=PROJECTION, **kws):
     """plot to shape (2, 3) gridspec"""
     trans = ccrs.PlateCarree()
