@@ -15,4 +15,4 @@ while getopts ":h" opt; do
 	esac
 done
 
-ffmpeg -framerate 10 -pattern_type glob -i "$1" -s 1920x1080 -c:v libx264 -preset slow $2
+ffmpeg -framerate 15 -pattern_type glob -i "$1" -s 1920x1080 -c:v libx264 -preset slow $2
