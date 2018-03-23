@@ -27,8 +27,8 @@ def make_parser():
                         help='interpolate output to 1 min resolution')
     parser.add_argument('-p', '--png', action='store_true',
                         help='store image output')
-    parser.add_argument('-m', '--mat', action='store_true',
-                        help='store mat output')
+    parser.add_argument('-t', '--tif', action='store_true',
+                        help='store geotiff output')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='increase output verbosity')
     parser.add_argument('-o', '--out-dir', type=str, default='.')
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     plt.close('all')
     parser = make_parser()
     args = parser.parse_args()
-    main(args.files, write_mat=args.mat, write_png=args.png,
+    main(args.files, write_tif=args.tif, write_png=args.png,
          interpolate=args.interpolate, resultsdir=args.out_dir,
          verbose=args.verbose)
     

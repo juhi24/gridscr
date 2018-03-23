@@ -41,4 +41,4 @@ echo "### Compositing."
 mkdir -p brancomp
 qpe_composite.sh grids > $LOG_DIR/qpe_composite.log 2> $LOG_DIR/qpe_composite.err
 echo "### Postprocessing."
-compost.py -ipmv -o composite brancomp/$DATE_GLOB.mat
+compost.py -iptv -o composite brancomp/$DATE_GLOB.mat

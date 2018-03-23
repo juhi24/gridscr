@@ -4,14 +4,13 @@ __metaclass__ = type
 
 import itertools
 import datetime
-import numpy as np
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
 from os import path
-from scipy.io import savemat
 from radcomp.qpe import interpolation
 from j24 import ensure_join, eprint
+from .gtiff import savetif
 from .plotting import (plotvars_core, plot_r, plot_kdp, plot_dbz,
                       datalist4timestep, PROJECTION)
 
@@ -62,7 +61,7 @@ def plot_frame(r, i_timestep, tim, data=None):
     return fig, dict(r=axd_r, zh=axd_dbz, kdp=axd_kdp)
 
 
-def batch_process(name, data=None, write_mat=True, write_png=True,
+def batch_process(name, data=None, write_tif=True, write_png=True,
                   resultsdir=None, interpolate=True, verbose=False):
     rc = data['rain_c']
     tstr = data['tim']
@@ -94,9 +93,9 @@ def batch_process(name, data=None, write_mat=True, write_png=True,
                 framepath = path.join(framedir, basename + '.png')
                 fig.savefig(framepath)
                 plt.close(fig)
-            if write_mat:
-                matdir = ensure_join(resultsdir, name, 'mat')
-                mat_out_fpath = path.join(matdir, basename + '.mat')
-                mdict = dict(time=np.array(str(tim)), R=r)
-                savemat(mat_out_fpath, mdict, do_compression=True)
+            if write_tif:
+                tifdir = ensure_join(resultsdir, name, 'tif')
+                tif_out_fpath = path.join(tifdir, basename + '.tif')
+                meta = {'TIFFTAG_DATETIME': str(tim)}
+                savetif(r, meta, tif_out_fpath)
 
