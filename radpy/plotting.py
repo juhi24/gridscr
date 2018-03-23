@@ -53,7 +53,7 @@ def plot_dbz(dbz, **kws):
     return plot_fun(vis.plot_dbz, dbz, **kws)
 
 
-def plotvars_core(gs, plotfun=vis.plot_r, data, plot_radars=True,
+def plotvars_core(gs, data, plotfun=vis.plot_r, plot_radars=True,
                   projection=PROJECTION, **kws):
     """plot to shape (2, 3) gridspec"""
     trans = ccrs.PlateCarree()
@@ -96,7 +96,7 @@ if __name__ == '__main__':
     fig_r, axd_r = plotvars(plotfun=plot_r, data=datalist4timestep(-1, param='r'))
     fig_kdp, axd_kdp = plotvars(plotfun=plot_kdp, data=datalist4timestep(-1, param='kdp'))
     fig_dbz, axd_dbz = plotvars(plotfun=plot_dbz, data=datalist4timestep(-1, param='dbz'))
-    figs = dict(KDP=fig_kdp, ZH=fig_dbz)#, R=fig_r) 
+    figs = dict(KDP=fig_kdp, ZH=fig_dbz)#, R=fig_r)
     for param in figs.keys():
         figfname = '{param}_{name}.png'.format(param=param, name=name)
         figs[param].savefig(path.join(RESULTSDIR, figfname))
