@@ -4,6 +4,7 @@ __metaclass__ = type
 
 import itertools
 import datetime
+import rasterio
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 from matplotlib import gridspec
@@ -97,5 +98,5 @@ def batch_process(name, data=None, write_tif=True, write_png=True,
                 tifdir = ensure_join(resultsdir, name, 'tif')
                 tif_out_fpath = path.join(tifdir, basename + '.tif')
                 meta = {'TIFFTAG_DATETIME': str(tim)}
-                savetif(r, meta, tif_out_fpath)
+                savetif(r.astype(rasterio.float32), meta, tif_out_fpath)
 

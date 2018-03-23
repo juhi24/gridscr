@@ -21,10 +21,12 @@ def grid_transform(shape, gridpath=GRID_FILE, p2=Proj(init='epsg:3879')):
 
 
 def savetif(r, metadata, tifpath, **kws):
+    r = r.T
+    crs = rasterio.crs.CRS({'init': 'epsg:3879'})
     trans = grid_transform(shape=r.shape, **kws)
     with rasterio.open(tifpath, 'w', driver='GTiff', height=r.shape[0],
                        width=r.shape[1], count=1, dtype=r.dtype,
-                       crs='EPSG:3879', transform=trans) as dst:
+                       crs=crs, transform=trans) as dst:
         dst.write(r, 1)
         dst.update_tags(**metadata)
 
