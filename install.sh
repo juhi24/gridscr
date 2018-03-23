@@ -9,5 +9,5 @@ $method $@ $cpconf *.py $prefix/bin/
 $method $@ $cpconf qpe_composite $prefix/bin/
 $method $@ $cpconf var2nc $prefix/bin/
 # Install datafiles
-mkdir -p $prefix/share/radpy/
-$method $@ $cpconf data/grid.mat $prefix/share/radpy/
+mkdir -p --mode=755 $prefix/share/radpy/
+$method $@ --chown=root:root -pogt --chmod=go=r data/grid.mat $prefix/share/radpy/
