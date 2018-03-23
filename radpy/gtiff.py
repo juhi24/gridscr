@@ -3,7 +3,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 __metaclass__ = type
 
 import rasterio
-import cartopy.crs as ccrs
 import numpy as np
 import matplotlib.pyplot as plt
 from pyproj import Proj, transform
@@ -12,13 +11,13 @@ from scipy.io import loadmat
 
 
 if __name__ == '__main__':
-    p1=Proj(init='epsg:4326')
-    p2=Proj(init='epsg:3879')
     grid_origin_lat = 60.287500
     grid_origin_lon = 24.982076
-    crs=rasterio.crs.CRS({"proj": "aeqd", "lat_0": grid_origin_lat, "lon_0": grid_origin_lon, "datum": "WGS84"})
+    crs = rasterio.crs.CRS({"proj": "aeqd", "lat_0": grid_origin_lat, "lon_0": grid_origin_lon, "datum": "WGS84"})
+    p1 = Proj(init='epsg:4326')
+    #p2=Proj(init='epsg:3879')
+    p2 = Proj(crs)
     xo, yo = transform(p1, p2, grid_origin_lon, grid_origin_lat)
-    proj = ccrs.Orthographic(central_longitude=25, central_latitude=60)
     hdd = '/media/jussitii/04fafa8f-c3ca-48ee-ae7f-046cf576b1ee'
     mat = path.join(hdd, 'composite/20171003/mat/20171003_0231.mat')
     gmat = path.join(hdd, 'grid.mat')
@@ -27,10 +26,10 @@ if __name__ == '__main__':
     tstr = data['time'][0]
     grid = loadmat(gmat)
     xs, ys = transform(p1, p2, grid['lon'], grid['lat'])
-    trans = rasterio.transform.from_bounds(xs[201,0], ys[-1, 201],
-                                   xs[201,-1], ys[0, 201],
+    trans = rasterio.transform.from_bounds(-50000, 50000,
+                                   50000, -50000,
                                    width=r.shape[1], height=r.shape[0])
-    with rasterio.open('/tmp/new.tif', 'w', driver='GTiff', height=r.shape[0],
+    with rasterio.open('/tmp/new1.tif', 'w', driver='GTiff', height=r.shape[0],
                    width=r.shape[1], count=1, dtype=r.dtype,
-                   crs='EPSG:3879', transform=trans) as dst:
+                   crs=crs, transform=trans) as dst:
         dst.write(r, 1)
